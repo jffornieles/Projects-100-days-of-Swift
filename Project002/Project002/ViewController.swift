@@ -25,6 +25,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(showScore))
+        
         countries += ["estonia", "france", "germany", "ireland", "italy", "monaco", "nigeria", "poland", "russia", "spain", "uk", "us"]
         
         button1.layer.borderWidth = 1
@@ -46,6 +48,13 @@ class ViewController: UIViewController {
         correctAnswer = Int.random(in: 0...2)
         title = "\(countries[correctAnswer].uppercased()), your score is \(score)"
         numberOfQuestions += 1
+    }
+    
+    @objc func showScore() {
+        
+        let alert = UIAlertController(title: "Score", message: "Your score is: \(score)", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Continue", style: .default, handler: nil))
+        present(alert, animated: true)
     }
 
     @IBAction func buttonTapped(_ sender: UIButton) {
