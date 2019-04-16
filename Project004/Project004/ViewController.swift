@@ -15,39 +15,25 @@ class ViewController: UIViewController, WKNavigationDelegate {
     var progressView: UIProgressView!
     var websites = ["apple.com", "hackingwithswift.com"]
     
+    @IBOutlet weak var tableView: UITableView!
+    
     override func loadView() {
-        
+
         super.loadView()
-        
+
         webView = WKWebView()
         webView.navigationDelegate = self
-        
-        
-        view = webView
+
+
+        // view = webView
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        tableView.delegate = self
+        tableView.dataSource = self
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(openTapped))
-
-        progressView = UIProgressView(progressViewStyle: .default)
-        progressView.sizeToFit()
-        let progressButton = UIBarButtonItem(customView: progressView)
-
-        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
-        let goBack = UIBarButtonItem(title: "GoBack", style: .plain, target: webView, action: #selector(webView.goBack))
-        let goForward = UIBarButtonItem(title: "GoForward", style: .plain, target: webView, action: #selector(webView.goForward))
-
-        toolbarItems = [goBack,progressButton, spacer, goForward, refresh]
-        navigationController?.isToolbarHidden = false
-
-        let url = URL(string: "https://" + websites[0] )!
-        webView.load(URLRequest(url: url))
-        webView.allowsBackForwardNavigationGestures = true
     }
     
     @objc func openTapped() {
@@ -95,6 +81,55 @@ class ViewController: UIViewController, WKNavigationDelegate {
         decisionHandler(.cancel)
     }
 
+}
+
+extension ViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return websites.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        cell.textLabel?.text = websites[indexPath.row]
+        
+        return cell
+    }
+    
+    
+}
+
+extension ViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        view = webView
+        
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(openTapped))
+        
+        progressView = UIProgressView(progressViewStyle: .default)
+        progressView.sizeToFit()
+        let progressButton = UIBarButtonItem(customView: progressView)
+        
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
+        let goBack = UIBarButtonItem(title: "GoBack", style: .plain, target: webView, action: #selector(webView.goBack))
+        let goForward = UIBarButtonItem(title: "GoForward", style: .plain, target: webView, action: #selector(webView.goForward))
+        
+        toolbarItems = [goBack,progressButton, spacer, goForward, refresh]
+        navigationController?.isToolbarHidden = false
+        
+        let url = URL(string: "https://" + websites[indexPath.row] )!
+        webView.load(URLRequest(url: url))
+        webView.allowsBackForwardNavigationGestures = true
+
+    }
+    
 }
 
 
